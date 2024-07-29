@@ -5,7 +5,7 @@ import struct
 import base64
 import logging
 import argparse
-from time import time
+import itertools
 from datetime import datetime
 from dataclasses import dataclass
 from collections.abc import Generator
@@ -313,10 +313,7 @@ class Server:
         """
         Creates a generator to cycle from 0 to 65535
         """
-        i = 0
-        while True:
-            yield i
-            i = (i + 1) % 65536
+        return itertools.cycle(range(65536))
 
     def _send_pull_ack(self, address: tuple[str, int], token: int) -> None:
         """
@@ -503,16 +500,16 @@ class DummyServer(Server):
         logger.info(f"Received packet from {gw_mac}: {rxpk}")
 
 
-def main():    
+def main():
     # Argument parser setup
     parser = argparse.ArgumentParser(description="Dummy PF Server")
-    parser.add_argument('--port', type=int, default=32100, help="Port to listen on")
+    parser.add_argument("--port", type=int, default=32100, help="Port to listen on")
     args = parser.parse_args()
 
     logger.info(f"Starting server on port {args.port}")
     server = DummyServer(args.port)
     server.start_server_loop()
-    
+
 
 if __name__ == "__main__":
     main()
